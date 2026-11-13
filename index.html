@@ -62,6 +62,18 @@ h2{font-size:clamp(1.8rem,5vw,3.2rem);margin-bottom:1rem;color:#fff}
 #pres div{margin-top:12px;display:flex;gap:10px;align-items:center}
 #pres button{border:1px solid #a9c8ff66;background:#131d38;color:#fff;border-radius:10px;padding:8px 16px;cursor:pointer;font:inherit}
 #pres em{margin-left:auto;font-style:normal;color:#a9c8ff;font-size:.85rem}
+
+#stage{overflow:hidden;overflow:clip}
+#storm{position:fixed;inset:0;z-index:200;display:none;overflow:hidden}
+#storm.on{display:block}
+#cs{position:absolute;inset:0}
+#cube{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;background:#04060c}
+.face::after{content:"";position:absolute;inset:0;background:#000;opacity:var(--d,0);pointer-events:none}
+.face .fw{position:absolute;left:0;top:0;width:100%}
+.face .glass{backdrop-filter:none;-webkit-backdrop-filter:none}
+#bolts{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#flash{position:absolute;inset:0;background:#dbe7ff;opacity:0;pointer-events:none}
 </style>
 </head>
 <body>
@@ -71,6 +83,7 @@ h2{font-size:clamp(1.8rem,5vw,3.2rem);margin-bottom:1rem;color:#fff}
 <radialGradient id="gb"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#a9c8ff"/><stop offset="1" stop-color="#a9c8ff" stop-opacity="0"/></radialGradient>
 </defs></svg>
 
+<div id="stage"><div id="world">
 <header id="hero">
 <h1>About Edwin Hubble...</h1>
 <p>Edwin Hubble was an American astronomer. He studied galaxies and sorted them into groups.</p>
@@ -110,8 +123,10 @@ h2{font-size:clamp(1.8rem,5vw,3.2rem);margin-bottom:1rem;color:#fff}
 <div class="grid" id="grid"></div>
 </section>
 
+</div></div>
 <button id="go">Thing</button>
 <div id="pres"><p id="say"></p><div><button id="pv">← Back</button><button id="nx">Next →</button><button id="cl">Close</button><em id="ct"></em></div></div>
+<div id="storm"><div id="cs"><div id="cube"></div></div><canvas id="bolts"></canvas><div id="flash"></div></div>
 
 <script>
 const $=s=>document.querySelector(s);
@@ -178,8 +193,8 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.targe
 document.querySelectorAll('.rv').forEach(e=>io.observe(e));
 
 const hero=$('#hero'),space=$('#space'),go=$('#go');
-function onScroll(){
-const p=Math.min(1,scrollY/(innerHeight*.8));
+function onScroll(pp){
+const p=typeof pp==="number"?pp:Math.min(1,scrollY/(innerHeight*.8));
 space.style.opacity=p;
 hero.style.background=`rgba(189,189,189,${1-p})`;
 const c=Math.round(34+221*p);hero.style.color=`rgb(${c},${c},${c})`;
@@ -199,6 +214,157 @@ x.fillStyle='#fff';
 for(const s of st){x.globalAlpha=.25+.65*Math.abs(Math.sin(t/900+s.t));x.beginPath();x.arc(s.x,s.y,s.r,0,6.28);x.fill()}
 requestAnimationFrame(tick)}
 requestAnimationFrame(tick);onScroll();
+
+const storm=$('#storm'),world=$('#world'),cs=$('#cs'),cube=$('#cube'),fl=$('#flash'),bc=$('#bolts'),bx=bc.getContext('2d');
+const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const zap=new Audio('Lightning.mp3');zap.preload='auto';
+let bolts=[],flash=0,shake=0,running=false,lastKind='';
+const rand=(a,b)=>a+Math.random()*(b-a);
+const ease=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+const PALS=[
+['rgba(90,130,255,.16)','rgba(160,200,255,.42)','#fff'],
+['rgba(170,80,255,.18)','rgba(210,150,255,.45)','#fbf0ff'],
+['rgba(255,170,50,.16)','rgba(255,215,130,.45)','#fffbe8'],
+['rgba(60,255,210,.15)','rgba(150,255,235,.42)','#f2fffc'],
+['rgba(255,60,60,.16)','rgba(255,150,130,.42)','#fff3f0']];
+
+function jag(x1,y1,x2,y2,d,out,j=.45){
+if(!d){out.push([x1,y1,x2,y2]);return}
+const L=Math.hypot(x2-x1,y2-y1),mx=(x1+x2)/2+(Math.random()-.5)*L*j,my=(y1+y2)/2+(Math.random()-.5)*L*j;
+jag(x1,y1,mx,my,d-1,out,j);jag(mx,my,x2,y2,d-1,out,j)}
+
+function arms(main,p,depth,len,out){
+main.forEach(s=>{if(Math.random()<p){
+const a=Math.atan2(s[3]-s[1],s[2]-s[0])+(Math.random()<.5?-1:1)*rand(.5,1.2),l=innerHeight*rand(len[0],len[1]);
+jag(s[2],s[3],s[2]+Math.cos(a)*l,s[3]+Math.sin(a)*l,depth,out)}})}
+
+const kinds={
+fork(){
+const w=innerWidth,h=innerHeight,x=rand(0,w),m=[],a=[];
+jag(x,-20,x+rand(-.25,.25)*w,h*rand(.55,1.05),7,m);arms(m,.09,5,[.12,.37],a);
+return{parts:[{s:m,k:1},{s:a,k:.5}],flash:rand(.55,.95),shake:10,vol:rand(.6,1),rate:rand(.9,1.15),life:rand(260,500)}},
+mega(){
+const w=innerWidth,h=innerHeight,x=rand(.25,.75)*w,m=[],a=[];
+jag(x,-20,x+rand(-.15,.15)*w,h*rand(.85,1.1),8,m,.38);arms(m,.15,6,[.15,.45],a);
+return{parts:[{s:m,k:2.3},{s:a,k:1.1}],flash:1,shake:32,vol:1,rate:rand(.65,.8),life:rand(650,850)}},
+twin(){
+const w=innerWidth,h=innerHeight,x=rand(.15,.85)*w,n=Math.random()<.4?3:2,parts=[];
+for(let i=0;i<n;i++){const m=[],a=[],sx=x+(i-(n-1)/2)*rand(.08,.2)*w;
+jag(sx,-20,sx+rand(-.15,.15)*w,h*rand(.6,1.05),7,m);arms(m,.07,4,[.1,.25],a);parts.push({s:m,k:.85},{s:a,k:.45})}
+return{parts,flash:rand(.75,1),shake:16,vol:rand(.75,1),rate:rand(.85,1),life:rand(350,550)}},
+angular(){
+const w=innerWidth,h=innerHeight,x=rand(0,w),m=[],a=[];
+jag(x,-20,x+rand(-.3,.3)*w,h*rand(.6,1.05),4,m,.7);arms(m,.22,3,[.1,.3],a);
+return{parts:[{s:m,k:.9},{s:a,k:.5}],flash:rand(.6,.85),shake:12,vol:rand(.6,.95),rate:rand(1.1,1.3),life:rand(220,380)}},
+crawler(){
+const w=innerWidth,h=innerHeight,y=h*rand(.05,.25),m=[],drops=[];
+jag(w*rand(0,.25),y,w*rand(.75,1),y+rand(-.06,.06)*h,7,m,.3);
+for(let i=0;i<rand(3,6);i++){const s=m[Math.floor(Math.random()*m.length)];jag(s[2],s[3],s[2]+rand(-.1,.1)*w,s[3]+h*rand(.2,.6),5,drops)}
+return{parts:[{s:m,k:1.2},{s:drops,k:.65}],flash:rand(.7,.9),shake:14,vol:rand(.7,.95),rate:rand(.75,.9),life:rand(600,850)}},
+sheet(){
+const w=innerWidth,h=innerHeight,m=[];
+jag(rand(0,w),-20,rand(0,w),h*rand(.2,.45),5,m);
+return{parts:[{s:m,k:.4}],blobs:[{x:rand(.1,.9)*w,y:rand(0,.4)*h,r:Math.max(w,h)*rand(.45,.85)}],flash:1,shake:4,vol:rand(.5,.7),rate:rand(1.1,1.3),life:rand(450,700)}},
+upward(){
+const w=innerWidth,h=innerHeight,x=rand(0,w),m=[],a=[];
+jag(x,h+20,x+rand(-.2,.2)*w,h*rand(0,.4),7,m);arms(m,.1,4,[.1,.3],a);
+return{parts:[{s:m,k:.85},{s:a,k:.45}],flash:rand(.55,.85),shake:10,vol:rand(.6,.9),rate:rand(1.15,1.35),life:rand(280,450)}}};
+const pool=[['fork',30],['twin',14],['angular',14],['crawler',10],['sheet',12],['upward',8],['mega',12]];
+function pickKind(){
+let k;
+do{const n=Math.random()*100;let t=0;k=pool.find(p=>(t+=p[1])>n)[0]}while(k===lastKind);
+return lastKind=k}
+
+function strike(kind){
+const o=kinds[kind||pickKind()]();
+o.pal=PALS[Math.random()<.55?0:1+Math.floor(Math.random()*(PALS.length-1))];
+o.born=performance.now();
+flash=Math.max(flash,calm?.3:o.flash);
+if(!calm)shake=Math.max(shake,o.shake);
+bolts.push(o);
+const s=zap.cloneNode(true);s.volume=Math.min(1,o.vol);s.playbackRate=o.rate;s.play().catch(()=>{})}
+
+function paint(now){
+const W=innerWidth,H=innerHeight;
+bx.clearRect(0,0,W,H);
+bx.globalCompositeOperation='lighter';bx.lineCap='round';bx.lineJoin='round';
+bolts=bolts.filter(o=>now-o.born<o.life);
+for(const o of bolts){
+const al=(1-(now-o.born)/o.life)*(Math.random()<.2?.35:1);
+for(const b of o.blobs||[]){
+const g=bx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);g.addColorStop(0,o.pal[1]);g.addColorStop(1,'rgba(0,0,0,0)');
+bx.globalAlpha=al*.8;bx.fillStyle=g;bx.fillRect(0,0,W,H)}
+for(const p of o.parts){
+if(!p.s.length)continue;
+[[16,o.pal[0]],[7,o.pal[1]],[2.5,o.pal[2]]].forEach(([w,c])=>{
+bx.globalAlpha=al;bx.strokeStyle=c;bx.lineWidth=w*p.k;bx.beginPath();
+for(const s of p.s){bx.moveTo(s[0],s[1]);bx.lineTo(s[2],s[3])}
+bx.stroke()})}}
+bx.globalAlpha=1}
+
+function copyCanvases(a,b){
+const x=a.querySelectorAll('canvas'),y=b.querySelectorAll('canvas');
+x.forEach((c,i)=>{y[i].width=c.width;y[i].height=c.height;y[i].getContext('2d').drawImage(c,0,0)})}
+
+function makeFace(off,tf){
+const f=document.createElement('div');f.className='face';
+const sp=$('#space').cloneNode(true),st=$('#stage').cloneNode(true),gb=$('#go').cloneNode(true),w=document.createElement('div');
+copyCanvases($('#space'),sp);copyCanvases($('#stage'),st);
+w.className='fw';w.style.transform=`translateY(${-off}px)`;w.append(st);
+f.append(sp,w,gb);f.style.transform=tf;return f}
+
+function run(){
+if(running)return;running=true;
+if(document.activeElement)document.activeElement.blur();
+const dpr=Math.min(devicePixelRatio||1,2);
+bc.width=innerWidth*dpr;bc.height=innerHeight*dpr;bx.setTransform(dpr,0,0,dpr,0,0);
+const W=document.documentElement.clientWidth,H=innerHeight;
+const big=$('#hubble .big');
+const target=Math.max(0,Math.min(document.documentElement.scrollHeight-H,big.getBoundingClientRect().top+scrollY+big.offsetHeight/2-H/2));
+const y0=scrollY,tz=`translateZ(${W/2}px)`;
+cs.style.perspective=Math.max(1400,W*1.3)+'px';
+const A=makeFace(y0,tz);
+cube.style.transform=`translateZ(${-W/2}px)`;
+cube.append(A);
+storm.style.background='#02030a';
+storm.classList.add('on');
+$('#stage').querySelectorAll('.rv').forEach(e=>e.classList.add('in'));
+scrollTo({top:target,behavior:'instant'});
+onScroll(Math.min(1,target/(H*.8)));
+const B=makeFace(target,`rotateY(90deg) ${tz}`);
+cube.append(B);
+strike('mega');
+const E=W*.34,TC=2150,t0=performance.now();
+let next=200,landed=false,last=t0,pth=0;
+function frame(now){
+const t=now-t0,dt=Math.max(1,now-last);last=now;
+const th=-90*ease(Math.max(0,Math.min(1,(t-450)/1200)));
+let ex;
+if(t<450)ex=E*ease(t/450);
+else if(t<1250)ex=E;
+else if(t<TC)ex=E*(1-ease((t-1250)/900));
+else ex=0;
+if(t>=next&&t<TC-100){strike();if(Math.random()<.3)strike();next=t+60+Math.random()*160}
+if(!landed&&t>=TC){landed=true;cube.innerHTML='';storm.style.background='none';strike('mega');if(!calm)shake=36;flash=1}
+if(!calm&&!landed)shake=Math.max(shake,3);
+const decay=dt/16.7;
+shake*=Math.pow(.9,decay);flash*=Math.pow(.84,decay);
+const jx=(Math.random()-.5)*shake,jy=(Math.random()-.5)*shake;
+if(!landed){
+cube.style.transform=`translateZ(${-W/2-ex}px) rotateY(${th}deg)`;
+const a=Math.abs(th)/90;
+A.style.setProperty('--d',a*.75);B.style.setProperty('--d',(1-a)*.75);
+const sp=Math.abs(th-pth)/dt*16.7;pth=th;
+cs.style.filter=(calm?'':`blur(${Math.min(6,sp*.6).toFixed(2)}px) `)+`brightness(${1+flash*.8})`;
+cs.style.transform=`translate(${jx}px,${jy}px)`}
+else{cs.style.filter='';cs.style.transform='';world.style.transform=`translate(${jx}px,${jy}px)`}
+fl.style.opacity=flash<.01?0:flash;
+paint(now);
+if(t<TC+300||bolts.length||flash>.02)requestAnimationFrame(frame);
+else{storm.classList.remove('on');world.style.transform='';fl.style.opacity=0;bolts=[];running=false}}
+requestAnimationFrame(frame)}
+
+addEventListener('keydown',e=>{if(e.code!=='Space')return;e.preventDefault();if(!e.repeat)run()});
 </script>
 </body>
 </html>
