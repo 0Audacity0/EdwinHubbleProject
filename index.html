@@ -13,9 +13,16 @@ html{scroll-behavior:smooth;background:#04060c}
 ::-webkit-scrollbar-track{background:linear-gradient(90deg,#03050a,#0a1020 50%,#03050a);border-left:1px solid #2a3c66;box-shadow:inset 0 0 12px #000}
 ::-webkit-scrollbar-thumb{border-radius:99px;border:5px solid transparent;background:linear-gradient(180deg,#e6eeff,#8fb0e8 45%,#4d6fb0) padding-box;box-shadow:inset 0 0 0 1px #ffffff77,inset 0 0 10px #ffffff66}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#fff,#a9c8ff 45%,#6a8fd0) padding-box}
-body{background:#04060c;color:#dfe6f5;font-family:"Segoe UI",system-ui,sans-serif;overflow-x:hidden}
+body{background:transparent;color:#dfe6f5;font-family:"Segoe UI",system-ui,sans-serif;overflow-x:hidden}
 #space{position:fixed;inset:0;z-index:-1;opacity:0;background:radial-gradient(ellipse at 15% 10%,#12234a99,transparent 55%),radial-gradient(ellipse at 90% 75%,#0d2f4a88,transparent 55%),radial-gradient(ellipse at 50% 105%,#3a2a1a66,transparent 50%),#04060c}
 #sky{position:absolute;inset:0;width:100%;height:100%}
+#space::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,#04060caa 100%);pointer-events:none}
+.titlerow{display:flex;align-items:center;gap:3vw;flex-wrap:wrap}
+.pw{--h:calc(2*clamp(3rem,11vw,8.5rem));height:var(--h);border-radius:14px;position:relative;flex:none;transition:box-shadow .5s,outline-color .5s;outline:3px solid transparent;outline-offset:5px}
+.pw img{height:100%;width:auto;display:block;border-radius:12px}
+.pw .ph{display:none;height:100%;aspect-ratio:3/4;align-items:center;justify-content:center;text-align:center;border:2px dashed #a9c8ff88;border-radius:12px;color:#a9c8ff;font-size:.9rem;padding:8px}
+.pw.hl{outline-color:#e8c88a;box-shadow:0 0 0 10px #e8c88a22,0 0 34px #e8c88a,0 0 70px #e8c88a66;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{outline-offset:11px;box-shadow:0 0 0 16px #e8c88a11,0 0 50px #e8c88a,0 0 100px #e8c88a77}}
 #hero{min-height:100vh;padding:env(safe-area-inset-top,0) 8vw 0;display:flex;flex-direction:column;justify-content:center;background:#bdbdbd;color:#222;font-family:"Times New Roman",serif}
 #hero h1{font-size:2rem;font-weight:normal}
 #hero p{margin-top:1rem;font-size:1rem;max-width:34rem;line-height:1.5}
@@ -26,7 +33,7 @@ section{padding:14vh 7vw;max-width:1200px;margin:0 auto}
 .big{font-size:clamp(3rem,11vw,8.5rem);font-weight:900;letter-spacing:.04em;line-height:1;background:linear-gradient(100deg,#fff,#cfe0ff,#f3e2bc,#fff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 8s linear infinite;filter:drop-shadow(0 0 24px #4d6fb088)}
 @keyframes shine{to{background-position:-250% 0}}
 .tag{letter-spacing:.5em;text-transform:uppercase;font-size:.8rem;color:#a9c8ff;margin-bottom:1.2rem}
-.lead{font-size:1.25rem;line-height:1.7;color:#c4cee3;max-width:46rem;margin-top:1.6rem}
+.lead{text-shadow:0 0 12px #04060c,0 0 4px #04060c;font-size:1.25rem;line-height:1.7;color:#c4cee3;max-width:46rem;margin-top:1.6rem}
 h2{font-size:clamp(1.8rem,5vw,3.2rem);margin-bottom:1rem;color:#fff}
 .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:2.5rem}
 .glass{background:linear-gradient(160deg,#ffffff14,#ffffff05);border:1px solid #ffffff26;border-radius:18px;padding:22px;backdrop-filter:blur(10px)}
@@ -70,7 +77,7 @@ h2{font-size:clamp(1.8rem,5vw,3.2rem);margin-bottom:1rem;color:#fff}
 </header>
 
 <section id="hubble">
-<div class="rv"><div class="tag">1889 – 1953</div><div class="big">EDWIN<br>HUBBLE</div>
+<div class="rv"><div class="tag">1889 – 1953</div><div class="titlerow"><div class="big">EDWIN<br>HUBBLE</div><div class="pw" id="edwin"><img src="Edwin.png" alt="Edwin Hubble" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ph">Put Edwin.png next to this file</div></div></div>
 <p class="lead">Working at Mount Wilson Observatory with the 100 inch Hooker telescope, Hubble measured the brightness of pulsating Cepheid stars, a method built on Henrietta Leavitt’s discovery, to show that the “Andromeda Nebula” lies far outside our own Milky Way</p></div>
 <div class="timeline">
 <div class="glass rv"><b>1924</b><span>Andromeda is shown to be its own galaxy, so the universe is far bigger than anyone thought</span></div>
@@ -162,9 +169,9 @@ $('#what').dataset.say='A galaxy is a giant system of stars, gas, dust and dark 
 $('#fork').dataset.say='In 1926 Hubble arranged galaxies on this tuning fork: ellipticals on the handle, spirals and barred spirals on the two prongs, and irregulars off to the side.';
 const steps=['hubble','what','fork','elliptical','spiral','lenticular','irregular'].map(i=>$('#'+i));
 let cur=0;
-function show(i){cur=Math.max(0,Math.min(steps.length-1,i));const e=steps[cur];$('#say').textContent=e.dataset.say;$('#ct').textContent=(cur+1)+' / '+steps.length;e.scrollIntoView({behavior:'smooth',block:e.tagName==='ARTICLE'?'center':'start'})}
+function show(i){cur=Math.max(0,Math.min(steps.length-1,i));const e=steps[cur];$('#edwin').classList.toggle('hl',e.id==='hubble');$('#say').textContent=e.dataset.say;$('#ct').textContent=(cur+1)+' / '+steps.length;e.scrollIntoView({behavior:'smooth',block:e.tagName==='ARTICLE'?'center':'start'})}
 $('#go').onclick=()=>{$('#pres').classList.add('on');show(0)};
-$('#nx').onclick=()=>show(cur+1);$('#pv').onclick=()=>show(cur-1);$('#cl').onclick=()=>$('#pres').classList.remove('on');
+$('#nx').onclick=()=>show(cur+1);$('#pv').onclick=()=>show(cur-1);$('#cl').onclick=()=>{$('#pres').classList.remove('on');$('#edwin').classList.remove('hl')};
 addEventListener('keydown',e=>{if(!$('#pres').classList.contains('on'))return;if(e.key==='ArrowRight')show(cur+1);if(e.key==='ArrowLeft')show(cur-1)});
 
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.15});
@@ -186,8 +193,8 @@ function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;st=Array.from({len
 size();addEventListener('resize',size);
 function tick(t){
 x.clearRect(0,0,W,H);
-const sz=Math.max(W,H)*1.25,spin=scrollY*.0008+t*.00004;
-x.save();x.translate(W*.5,H*.55-scrollY*.04);x.rotate(-.45);x.scale(1,.78);x.rotate(spin);x.globalAlpha=.8;x.drawImage(gal,-sz/2,-sz/2,sz,sz);x.restore();
+const sz=Math.max(W,H)*1.05,spin=t*.00004;
+x.save();x.translate(W*.5,H*.55-scrollY*.04);x.rotate(-.45);x.scale(1,.78);x.rotate(spin);x.globalAlpha=.55;x.drawImage(gal,-sz/2,-sz/2,sz,sz);x.restore();
 x.fillStyle='#fff';
 for(const s of st){x.globalAlpha=.25+.65*Math.abs(Math.sin(t/900+s.t));x.beginPath();x.arc(s.x,s.y,s.r,0,6.28);x.fill()}
 requestAnimationFrame(tick)}
