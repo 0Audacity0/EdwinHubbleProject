@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edwin Hubble and the Galaxy Zoo</title>
+<style>
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;background:#04060c}
+@supports not selector(::-webkit-scrollbar){html{scrollbar-color:#7f9fd8 #070b14}}
+::-webkit-scrollbar{width:20px}
+::-webkit-scrollbar-button{display:none}
+::-webkit-scrollbar-track{background:linear-gradient(90deg,#03050a,#0a1020 50%,#03050a);border-left:1px solid #2a3c66;box-shadow:inset 0 0 12px #000}
+::-webkit-scrollbar-thumb{border-radius:99px;border:5px solid transparent;background:linear-gradient(180deg,#e6eeff,#8fb0e8 45%,#4d6fb0) padding-box;box-shadow:inset 0 0 0 1px #ffffff77,inset 0 0 10px #ffffff66}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#fff,#a9c8ff 45%,#6a8fd0) padding-box}
+body{background:#04060c;color:#dfe6f5;font-family:"Segoe UI",system-ui,sans-serif;overflow-x:hidden}
+#space{position:fixed;inset:0;z-index:-1;opacity:0;background:radial-gradient(ellipse at 15% 10%,#12234a99,transparent 55%),radial-gradient(ellipse at 90% 75%,#0d2f4a88,transparent 55%),radial-gradient(ellipse at 50% 105%,#3a2a1a66,transparent 50%),#04060c}
+#sky{position:absolute;inset:0;width:100%;height:100%}
+#hero{min-height:100vh;padding:env(safe-area-inset-top,0) 8vw 0;display:flex;flex-direction:column;justify-content:center;background:#bdbdbd;color:#222;font-family:"Times New Roman",serif}
+#hero h1{font-size:2rem;font-weight:normal}
+#hero p{margin-top:1rem;font-size:1rem;max-width:34rem;line-height:1.5}
+#hero small{margin-top:2rem;font-size:.9rem}
+section{padding:14vh 7vw;max-width:1200px;margin:0 auto}
+.rv{opacity:0;transform:translateY(50px);transition:opacity 1s,transform 1s}
+.rv.in{opacity:1;transform:none}
+.big{font-size:clamp(3rem,11vw,8.5rem);font-weight:900;letter-spacing:.04em;line-height:1;background:linear-gradient(100deg,#fff,#cfe0ff,#f3e2bc,#fff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 8s linear infinite;filter:drop-shadow(0 0 24px #4d6fb088)}
+@keyframes shine{to{background-position:-250% 0}}
+.tag{letter-spacing:.5em;text-transform:uppercase;font-size:.8rem;color:#a9c8ff;margin-bottom:1.2rem}
+.lead{font-size:1.25rem;line-height:1.7;color:#c4cee3;max-width:46rem;margin-top:1.6rem}
+h2{font-size:clamp(1.8rem,5vw,3.2rem);margin-bottom:1rem;color:#fff}
+.timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:2.5rem}
+.glass{background:linear-gradient(160deg,#ffffff14,#ffffff05);border:1px solid #ffffff26;border-radius:18px;padding:22px;backdrop-filter:blur(10px)}
+.glass b{display:block;font-size:1.6rem;color:#e8c88a;margin-bottom:6px}
+.glass span{color:#c4cee3;line-height:1.5;font-size:.95rem}
+.fork{margin-top:2rem;width:100%;height:auto}
+.fork text{fill:#dfe6f5;font-size:14px;text-anchor:middle}
+.fork line{stroke:#6f8fc8;stroke-width:2}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;margin-top:2.5rem}
+.card{padding:0;overflow:hidden;transition:transform .4s,box-shadow .4s}
+.card:hover{transform:translateY(-8px);box-shadow:0 0 36px #4d6fb066}
+.art{background:#010204;display:flex;justify-content:center;border-bottom:1px solid #ffffff1c}
+.art canvas{width:100%;max-width:300px;height:auto;display:block}
+.card .in2{padding:22px}
+.card h3{font-size:1.6rem;color:#fff}
+.card h3 small{font-size:.85rem;color:#a9c8ff;margin-left:8px;letter-spacing:.15em}
+.card p{margin-top:.7rem;line-height:1.6;color:#c4cee3}
+.chips{margin-top:1rem;display:flex;flex-wrap:wrap;gap:8px}
+.chips i{font-style:normal;font-size:.78rem;padding:5px 11px;border-radius:99px;background:#a9c8ff1c;border:1px solid #a9c8ff44}
+#classes{padding-bottom:30vh}
+#go{position:fixed;right:34px;bottom:24px;z-index:40;border:1px solid #a9c8ff;border-radius:99px;padding:13px 22px;font:700 1rem inherit;font-family:inherit;color:#fff;cursor:pointer;background:linear-gradient(180deg,#2b4378,#17264a);box-shadow:0 0 20px #4d6fb088;opacity:0;pointer-events:none;transition:opacity .6s}
+#go.on{opacity:1;pointer-events:auto}
+#pres{position:fixed;left:0;right:0;bottom:0;z-index:45;padding:18px 7vw calc(18px + env(safe-area-inset-bottom,0px));background:#070b16f0;border-top:1px solid #a9c8ff66;transform:translateY(110%);transition:transform .5s}
+#pres.on{transform:none}
+#pres p{font-size:1.15rem;line-height:1.55;max-width:60rem}
+#pres div{margin-top:12px;display:flex;gap:10px;align-items:center}
+#pres button{border:1px solid #a9c8ff66;background:#131d38;color:#fff;border-radius:10px;padding:8px 16px;cursor:pointer;font:inherit}
+#pres em{margin-left:auto;font-style:normal;color:#a9c8ff;font-size:.85rem}
+</style>
+</head>
+<body>
+<div id="space"><canvas id="sky"></canvas></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<radialGradient id="gCore"><stop offset="0" stop-color="#fff8e0"/><stop offset=".3" stop-color="#e8c88a"/><stop offset="1" stop-color="#8a6a3a" stop-opacity="0"/></radialGradient>
+<radialGradient id="gb"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#a9c8ff"/><stop offset="1" stop-color="#a9c8ff" stop-opacity="0"/></radialGradient>
+</defs></svg>
+
+<header id="hero">
+<h1>About Edwin Hubble...</h1>
+<p>Edwin Hubble was an American astronomer. He studied galaxies and sorted them into groups. Please scroll down for more information.</p>
+<small>(scroll down)</small>
+</header>
+
+<section id="hubble">
+<div class="rv"><div class="tag">1889 – 1953</div><div class="big">EDWIN<br>HUBBLE</div>
+<p class="lead">Working at Mount Wilson Observatory with the 100-inch Hooker telescope, Hubble measured the brightness of pulsating Cepheid stars, a method built on Henrietta Leavitt’s discovery, to show that the “Andromeda Nebula” lies far outside our own Milky Way.</p></div>
+<div class="timeline">
+<div class="glass rv"><b>1924</b><span>Andromeda is shown to be its own galaxy, so the universe is far bigger than anyone thought.</span></div>
+<div class="glass rv"><b>1926</b><span>He publishes a classification of galaxies by shape, the start of the Hubble Sequence.</span></div>
+<div class="glass rv"><b>1929</b><span>Galaxies are found to move away from us faster the farther they are: the expanding universe.</span></div>
+<div class="glass rv"><b>1936</b><span>His book “The Realm of the Nebulae” presents the finished tuning-fork scheme.</span></div>
+</div>
+</section>
+
+<section id="what">
+<div class="rv"><div class="tag">First question</div><h2>What is a galaxy?</h2>
+<p class="lead">A galaxy is a huge collection of stars, gas, dust and dark matter bound together by gravity. Small ones hold millions of stars, giants hold trillions, and our Milky Way holds a few hundred billion. The observable universe contains billions of them, and Hubble noticed they come in only a few basic shapes.</p></div>
+</section>
+
+<section id="fork">
+<div class="rv"><div class="tag">The Hubble Sequence</div><h2>The tuning fork</h2>
+<p class="lead">Ellipticals form the handle, running from round (E0) to stretched (E7). At the fork sit the lenticulars (S0), and from there the spirals split into two prongs: normal spirals above and barred spirals below. Irregulars fit nowhere on it. Hubble drew it only as a sorting scheme and did not claim galaxies evolve along it.</p>
+<svg class="fork" viewBox="0 0 700 300" role="img" aria-label="Hubble tuning fork diagram">
+<line x1="40" y1="150" x2="290" y2="150"/><line x1="290" y1="150" x2="370" y2="70"/><line x1="370" y1="70" x2="640" y2="70"/><line x1="290" y1="150" x2="370" y2="230"/><line x1="370" y1="230" x2="640" y2="230"/>
+<g fill="url(#gCore)"><ellipse cx="70" cy="150" rx="22" ry="22"/><ellipse cx="140" cy="150" rx="24" ry="17"/><ellipse cx="215" cy="150" rx="28" ry="9"/><ellipse cx="290" cy="150" rx="26" ry="7"/></g>
+<text x="70" y="195">E0</text><text x="140" y="195">E3</text><text x="215" y="195">E7</text><text x="150" y="120" style="fill:#e8c88a">Elliptical</text><text x="290" y="180" style="fill:#e8c88a">S0 lenticular</text>
+<g fill="url(#gb)"><circle cx="440" cy="70" r="14"/><circle cx="520" cy="70" r="14"/><circle cx="600" cy="70" r="14"/><circle cx="440" cy="230" r="14"/><circle cx="520" cy="230" r="14"/><circle cx="600" cy="230" r="14"/></g>
+<text x="440" y="105">Sa</text><text x="520" y="105">Sb</text><text x="600" y="105">Sc</text><text x="440" y="265">SBa</text><text x="520" y="265">SBb</text><text x="600" y="265">SBc</text>
+<text x="520" y="40" style="fill:#e8c88a">Spiral</text><text x="520" y="292" style="fill:#e8c88a">Barred spiral</text>
+</svg></div>
+</section>
+
+<section id="classes">
+<div class="rv"><div class="tag">The four classes</div><h2>Galaxy poster</h2></div>
+<div class="grid" id="grid"></div>
+</section>
+
+<button id="go">▶ Present this poster</button>
+<div id="pres"><p id="say"></p><div><button id="pv">← Back</button><button id="nx">Next →</button><button id="cl">Close</button><em id="ct"></em></div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+function rng(a){return()=>(a=a*16807%2147483647)/2147483647}
+
+function makeGal(type,S,seed,bar,ti){
+const cv=document.createElement('canvas');cv.width=cv.height=S;
+const g=cv.getContext('2d'),r=rng(seed),c=S/2,gs=()=>(r()+r()+r()+r()-2)*.9;
+const u=S/300,dot=(x,y,col,a,s)=>{g.globalAlpha=a;g.fillStyle=col;g.fillRect(x,y,s*u,s*u)};
+const glow=(x,y,rad,col,a)=>{const q=g.createRadialGradient(x,y,0,x,y,rad);q.addColorStop(0,col);q.addColorStop(1,'rgba(0,0,0,0)');g.globalAlpha=a;g.fillStyle=q;g.fillRect(0,0,S,S)};
+const pick=a=>a[Math.floor(r()*a.length)],warm=['#ffe2b0','#ffcf90','#ffbd80'],cool=['#cfe0ff','#e6f0ff','#b4ccff'];
+const tilt=ti||{elliptical:.62,spiral:bar?.8:.9,lenticular:.3,irregular:1}[type];
+g.globalCompositeOperation='lighter';
+g.translate(c,c);g.rotate(type==='irregular'?0:-.5+r()*.4);g.scale(1,tilt);g.translate(-c,-c);
+if(type==='elliptical'){
+for(let i=0;i<12000;i++)dot(c+gs()*S*.18,c+gs()*S*.18,pick(warm),.3,1);
+glow(c,c,S*.3,'#ffd6a0',.5);glow(c,c,S*.09,'#fff6e0',.9);
+}else if(type==='spiral'){
+const r0=bar?S*.1:S*.03,R=S*.42,tn=bar?3.2:4.2;
+const pt=(k,t,j)=>{const a=k*Math.PI+t*tn,d=r0+t*R,q=gs()*S*.03*(1+t)*j;return[c+d*Math.cos(a)-q*Math.sin(a),c+d*Math.sin(a)+q*Math.cos(a)]};
+for(let i=0;i<15000;i++){const t=Math.pow(r(),.8),p=pt(r()<.5?0:1,t,1);dot(p[0],p[1],t<.35?pick(warm):pick(cool),.32,1)}
+for(let i=0;i<260;i++){const p=pt(r()<.5?0:1,.2+r()*.8,.6);dot(p[0],p[1],'#dbe9ff',.9,2)}
+for(let i=0;i<5000;i++){const a=r()*6.28,d=Math.sqrt(r())*R;dot(c+d*Math.cos(a),c+d*Math.sin(a),'#c9d9ff',.14,1)}
+for(let i=0;i<4000;i++)dot(c+gs()*S*.05,c+gs()*S*.05,pick(warm),.4,1);
+if(bar)for(let i=0;i<3000;i++)dot(c+gs()*S*.11,c+gs()*S*.012,pick(warm),.45,1);
+glow(c,c,S*.14,'#ffd6a0',.7);glow(c,c,S*.04,'#fff',.9);
+}else if(type==='lenticular'){
+for(let i=0;i<10000;i++)dot(c+gs()*S*.21,c+gs()*S*.022,'#f0dcc0',.28,1);
+for(let i=0;i<4000;i++)dot(c+gs()*S*.075,c+gs()*S*.075,pick(warm),.4,1);
+glow(c,c,S*.16,'#ffd6a0',.65);glow(c,c,S*.05,'#fff',.9);
+g.globalCompositeOperation='source-over';g.globalAlpha=.6;g.strokeStyle='#000';g.lineWidth=S*.01;g.beginPath();g.moveTo(c-S*.3,c+S*.012);g.lineTo(c+S*.3,c+S*.012);g.stroke();
+}else{
+for(let k=0;k<7;k++){const x=c+gs()*S*.28,y=c+gs()*S*.28,sd=S*(.03+r()*.04);
+for(let i=0;i<1600;i++)dot(x+gs()*sd,y+gs()*sd,r()<.8?pick(cool):pick(warm),.3,1);
+glow(x,y,sd*2.2,'#9fbfff',.35)}
+for(let i=0;i<3500;i++)dot(c+gs()*S*.2,c+gs()*S*.2,'#9fb8e8',.14,1);
+}
+return cv}
+
+const cls=[
+{n:'Elliptical',c:'E0 – E7',t:'Smooth, featureless balls of mostly old, reddish stars with very little gas or dust. They range from nearly round (E0) to long and stretched (E7), and the biggest galaxies of all are giant ellipticals.',f:['Old stars','Little gas','No arms','Round to oval'],say:'Ellipticals are smooth, rounded balls of old, reddish stars with little gas. They’re numbered from E0, perfectly round, to E7, the most stretched.'},
+{n:'Spiral',c:'S and SB',t:'A bright central bulge inside a flat, spinning disk with arms full of gas and young blue stars where new stars are born. Many have a bar across the middle, like our Milky Way. Tighter arms mean a bigger bulge (Sa to Sc).',f:['Young blue arms','Active star birth','Disk + bulge','Milky Way is barred'],say:'Spirals have a bright center and a flat disk with arms full of young blue stars. Many, including our Milky Way, have a bar through the middle.'},
+{n:'Lenticular',c:'S0',t:'Lens-shaped galaxies in between: a disk and bulge like a spiral, but with no visible arms and almost no new stars. They sit at the junction of the tuning fork.',f:['Disk, no arms','Mostly old stars','Little gas','The in-between type'],say:'Lenticulars sit at the junction of the fork: a disk like a spiral, but with no arms and almost no new star formation.'},
+{n:'Irregular',c:'Irr',t:'Galaxies with no regular shape, often small, messy and rich in gas. Many look this way because of close encounters or collisions. The Large Magellanic Cloud is a nearby example.',f:['No set shape','Gas-rich','Star-forming','Often small'],say:'Irregulars have no regular shape, often because of collisions or close passes. They are gas-rich and busy forming stars, like the Large Magellanic Cloud.'}];
+$('#grid').innerHTML=cls.map(k=>`<article class="glass card rv" id="${k.n.toLowerCase()}" data-say="${k.say}"><div class="art"></div><div class="in2"><h3>${k.n}<small>${k.c}</small></h3><p>${k.t}</p><div class="chips">${k.f.map(x=>`<i>${x}</i>`).join('')}</div></div></article>`).join('');
+const art=n=>$('#'+n+' .art');
+art('elliptical').append(makeGal('elliptical',300,5));
+art('spiral').append(makeGal('spiral',300,11,0),makeGal('spiral',300,12,1));
+art('spiral').style.cssText='display:flex;gap:0';
+art('lenticular').append(makeGal('lenticular',300,9));
+art('irregular').append(makeGal('irregular',300,21));
+
+$('#hubble').dataset.say='This is Edwin Hubble, the astronomer who proved galaxies are enormous, separate star cities, and then sorted them by their shape.';
+$('#what').dataset.say='A galaxy is a giant system of stars, gas, dust and dark matter held together by gravity. Our Milky Way is just one of billions.';
+$('#fork').dataset.say='In 1926 Hubble arranged galaxies on this tuning fork: ellipticals on the handle, spirals and barred spirals on the two prongs, and irregulars off to the side.';
+const steps=['hubble','what','fork','elliptical','spiral','lenticular','irregular'].map(i=>$('#'+i));
+let cur=0;
+function show(i){cur=Math.max(0,Math.min(steps.length-1,i));const e=steps[cur];$('#say').textContent=e.dataset.say;$('#ct').textContent=(cur+1)+' / '+steps.length;e.scrollIntoView({behavior:'smooth',block:e.tagName==='ARTICLE'?'center':'start'})}
+$('#go').onclick=()=>{$('#pres').classList.add('on');show(0)};
+$('#nx').onclick=()=>show(cur+1);$('#pv').onclick=()=>show(cur-1);$('#cl').onclick=()=>$('#pres').classList.remove('on');
+addEventListener('keydown',e=>{if(!$('#pres').classList.contains('on'))return;if(e.key==='ArrowRight')show(cur+1);if(e.key==='ArrowLeft')show(cur-1)});
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.15});
+document.querySelectorAll('.rv').forEach(e=>io.observe(e));
+
+const hero=$('#hero'),space=$('#space'),go=$('#go');
+function onScroll(){
+const p=Math.min(1,scrollY/(innerHeight*.8));
+space.style.opacity=p;
+hero.style.background=`rgba(189,189,189,${1-p})`;
+const c=Math.round(34+221*p);hero.style.color=`rgb(${c},${c},${c})`;
+go.classList.toggle('on',p>.9);
+}
+addEventListener('scroll',onScroll,{passive:true});
+
+const cv=$('#sky'),x=cv.getContext('2d');let st=[],W,H;
+const gal=makeGal('spiral',640,3,0,1);
+function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;st=Array.from({length:220},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.2,t:Math.random()*6}))}
+size();addEventListener('resize',size);
+function tick(t){
+x.clearRect(0,0,W,H);
+const sz=Math.max(W,H)*1.25,spin=scrollY*.0008+t*.00004;
+x.save();x.translate(W*.5,H*.55-scrollY*.04);x.rotate(-.45);x.scale(1,.78);x.rotate(spin);x.globalAlpha=.8;x.drawImage(gal,-sz/2,-sz/2,sz,sz);x.restore();
+x.fillStyle='#fff';
+for(const s of st){x.globalAlpha=.25+.65*Math.abs(Math.sin(t/900+s.t));x.beginPath();x.arc(s.x,s.y,s.r,0,6.28);x.fill()}
+requestAnimationFrame(tick)}
+requestAnimationFrame(tick);onScroll();
+</script>
+</body>
+</html>
